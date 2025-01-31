@@ -44,8 +44,8 @@ services:
     links:
       - db:db
     environment:
-      DEFAULT_USER: admin
-      DEFAULT_PASSWORD: to_be_modified
+      PGADMIN_DEFAULT_EMAIL: 'email@to_be_modified'    
+      PGADMIN_DEFAULT_PASSWORD: 'to_be_modified'
      # VIRTUAL_HOST: 
      # LETSENCRYPT_HOST:
      # VIRTUAL_PORT: 5050
