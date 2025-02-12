@@ -107,12 +107,6 @@ docker-compose build
 docker-compose down
 ```
 
-**Stop Odoo**:
-
-``` bash
-docker-compose down
-```
-
 **For import db**:
 
 ``` bash
