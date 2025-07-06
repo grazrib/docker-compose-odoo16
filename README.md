@@ -58,13 +58,35 @@ docker-compose up -d
 ```sh
 $ git clone https://github.com/grazrib/docker-compose-odoo16.git
 $ cd docker-compose-odoo16
-$ sudo chmod -R 755 addons
-$ sudo chmod -R 755 etc
-$ mkdir -p postgresql
-$ sudo chmod -R 755 postgresql
+
+# Crea le directory necessarie
+$ mkdir -p postgresql addons etc pgadmin-data
+
+# Imposta permessi per Odoo (UID:GID 101:101)
 $ sudo chown -R 101:101 addons etc
+$ sudo chmod -R 755 addons etc
+
+# Imposta permessi per PostgreSQL (UID:GID 5432:5432)  
 $ sudo chown -R 5432:5432 postgresql
+$ sudo chmod -R 700 postgresql
+
+# Imposta permessi per PgAdmin (UID:GID 5050:5050)
+$ sudo chown -R 5050:5050 pgadmin-data
+$ sudo chmod -R 755 pgadmin-data
+
+# Rende eseguibile l'entrypoint
+$ chmod +x entrypoint.sh
+
+# Verifica permessi (opzionale)
+$ ls -la
 ```
+
+**Spiegazione dei permessi:**
+- **101:101** = utente Odoo nel container
+- **5432:5432** = utente PostgreSQL nel container  
+- **5050:5050** = utente PgAdmin nel container
+- **755** = lettura/esecuzione per tutti, scrittura per proprietario
+- **700** = accesso completo solo per il proprietario (sicurezza database)
 
 Aumenta il numero massimo di file osservati da 8192 (predefinito) a **524288**. Per evitare errori quando eseguiamo più istanze di Odoo. Questo è un passaggio *opzionale*. Questi comandi sono per utenti Ubuntu:
 
