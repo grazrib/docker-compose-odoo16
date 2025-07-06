@@ -1,18 +1,15 @@
-# Database PostgreSQL
+# Dati database PostgreSQL
 postgresql/
 
-# Log files
+# Log files Odoo
 etc/odoo-server.log
+etc/*.log
 *.log
 
-# Addons installati dinamicamente
-etc/addons/
-
-# Sessioni Odoo
+# Sessioni e cache Odoo
 etc/sessions/
-
-# Filestore Odoo
 etc/filestore/
+etc/addons/
 
 # Dati PgAdmin
 pgadmin-data/
@@ -21,21 +18,30 @@ pgadmin-data/
 *.tmp
 *.temp
 .tmp/
+.cache/
 
-# File di backup
+# Backup files
 *.backup
 *.bak
+*.sql
+*.dump
 
-# Cache Python
+# Python cache
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
 
 # Environment files
 .env
 .env.local
 .env.*.local
+.venv/
+env/
+venv/
 
 # IDE files
 .vscode/
@@ -43,6 +49,8 @@ __pycache__/
 *.swp
 *.swo
 *~
+.project
+.pydevproject
 
 # OS generated files
 .DS_Store
@@ -52,16 +60,33 @@ __pycache__/
 .Trashes
 ehthumbs.db
 Thumbs.db
+desktop.ini
 
-# Docker volumes (se creati localmente)
-docker-volumes/
+# Docker files
+.docker/
+docker-compose.override.yml
+.dockerignore
 
 # SSL certificates
 *.pem
 *.key
 *.crt
 *.csr
+*.p12
+ssl/
 
-# Backup database
-*.sql
-*.dump
+# Logs directory
+logs/
+
+# Node modules (se presenti)
+node_modules/
+npm-debug.log
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Pytest
+.pytest_cache/
