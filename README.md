@@ -1,268 +1,266 @@
-# Quick install
+# Docker Compose Odoo 16 
 
-Installazione di Odoo 16 con un solo comando.
+**Installazione rapida di Odoo 16 con un solo comando.**  
+Supporta istanze multiple su un singolo server con fix SSL/TLS testati.
 
-(Supporta istanze multiple di Odoo su un singolo server)
+[![Docker](https://img.shields.io/badge/Docker-✓-blue)](https://www.docker.com/)
+[![Odoo 16](https://img.shields.io/badge/Odoo-16.0-purple)](https://www.odoo.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)](https://postgresql.org/)
 
-Installa [docker](https://docs.docker.com/get-docker/) e [docker-compose](https://docs.docker.com/compose/install/), poi esegui:
+## 🚀 Installazione Rapida
+
+Installa [Docker](https://docs.docker.com/get-docker/) e [Docker Compose](https://docs.docker.com/compose/install/), poi esegui:
 
 ```bash
 curl -s https://raw.githubusercontent.com/grazrib/docker-compose-odoo16/master/run.sh | sudo bash -s odoo-one 10016 20016
 ```
 
-per configurare la prima istanza di Odoo @ `localhost:10016` (password master predefinita: `to_be_modified`)
+**Prima istanza** → `http://localhost:10016` (Password: `to_be_modified`)
 
-e
-
+Per una seconda istanza:
 ```bash
 curl -s https://raw.githubusercontent.com/grazrib/docker-compose-odoo16/master/run.sh | sudo bash -s odoo-two 11016 21016
 ```
 
-per configurare un'altra istanza di Odoo @ `localhost:11016` (password master predefinita: `to_be_modified`)
+**Seconda istanza** → `http://localhost:11016`
 
-Parametri:
-* Primo parametro (**odoo-one**): Cartella di deploy di Odoo
-* Secondo parametro (**10016**): Porta di Odoo
-* Terzo parametro (**20016**): Porta live chat
+### Parametri
+- **odoo-one**: Nome directory installazione
+- **10016**: Porta Odoo
+- **20016**: Porta live chat
 
-Se `curl` non è trovato, installalo:
+## 📋 Cosa include
+
+- ✅ **Odoo 16** con fix SSL/TLS funzionanti
+- ✅ **PostgreSQL 15** ottimizzato 
+- ✅ **PgAdmin 4** per gestione database
+- ✅ **Volumi Docker** per persistenza dati
+- ✅ **Health checks** automatici
+- ✅ **Support OCA addons** ready
+
+## 🔧 Utilizzo Manuale
 
 ```bash
-$ sudo apt-get install curl
-# oppure
-$ sudo yum install curl
-```
+# Clona repository
+git clone https://github.com/grazrib/docker-compose-odoo16.git
+cd docker-compose-odoo16
 
-# Utilizzo
-
-Avvia il container:
-```sh
-docker-compose up
-```
-
-* Poi apri `localhost:10016` per accedere a Odoo 16.0. Se vuoi avviare il server con una porta diversa, modifica **10016** con un altro valore in **docker-compose.yml**:
-
-```yaml
-ports:
- - "10016:8069"
-```
-
-Esegui il container Odoo in modalità detached (per poter chiudere il terminale senza fermare Odoo):
-
-```sh
+# Avvia servizi
 docker-compose up -d
+
+# Accedi a Odoo
+# http://localhost:10016
 ```
 
-**Se ottieni problemi di permessi**, modifica i permessi delle cartelle per assicurarti che il container possa accedere alle directory:
+## 🌐 Accessi
 
-```sh
-$ git clone https://github.com/grazrib/docker-compose-odoo16.git
-$ cd docker-compose-odoo16
+| Servizio | URL | Credenziali |
+|----------|-----|-------------|
+| **Odoo** | http://localhost:10016 | Master: `to_be_modified` |
+| **PgAdmin** | http://localhost:5050 | Email: `admin@example.com`<br>Pass: `admin123` |
+| **Live Chat** | Porta 20016 | Configurato automaticamente |
 
-# Crea le directory necessarie
-mkdir -p postgresql addons etc pgadmin-data
+## ⚙️ Configurazione OpenLiteSpeed
 
-# Imposta permessi per Odoo (UID:GID 101:101)
-sudo chown -R 101:101 addons etc
-sudo chmod -R 755 addons etc
+### Virtual Host Configuration
 
-# Imposta permessi per PostgreSQL (UID:GID 5432:5432)  
-sudo chown -R 5432:5432 postgresql
-sudo chmod -R 700 postgresql
+Crea un Virtual Host con questi Context:
 
-# Imposta permessi per PgAdmin (UID:GID 5050:5050)
-sudo chown -R 5050:5050 pgadmin-data
-sudo chmod -R 755 pgadmin-data
-
-# Rende eseguibile l'entrypoint
-chmod +x entrypoint.sh
-
-# Verifica permessi (opzionale)
-ls -la
+**Context 1 - Main App:**
+```
+Type: Proxy
+URI: /
+Address: 127.0.0.1:10016
+Extra Headers:
+X-Real-IP $remote_addr
+X-Forwarded-For $proxy_add_x_forwarded_for
+X-Forwarded-Proto $scheme
+X-Forwarded-Host $host
 ```
 
-**Spiegazione dei permessi:**
-- **101:101** = utente Odoo nel container
-- **5432:5432** = utente PostgreSQL nel container  
-- **5050:5050** = utente PgAdmin nel container
-- **755** = lettura/esecuzione per tutti, scrittura per proprietario
-- **700** = accesso completo solo per il proprietario (sicurezza database)
-
-Aumenta il numero massimo di file osservati da 8192 (predefinito) a **524288**. Per evitare errori quando eseguiamo più istanze di Odoo. Questo è un passaggio *opzionale*. Questi comandi sono per utenti Ubuntu:
-
-```bash
-$ if grep -qF "fs.inotify.max_user_watches" /etc/sysctl.conf; then echo $(grep -F "fs.inotify.max_user_watches" /etc/sysctl.conf); else echo "fs.inotify.max_user_watches = 524288" | sudo tee -a /etc/sysctl.conf; fi
-$ sudo sysctl -p    # applica immediatamente la nuova configurazione
+**Context 2 - Live Chat:**
+```
+Type: Proxy  
+URI: /longpolling/
+Address: 127.0.0.1:20016
+Extra Headers:
+X-Real-IP $remote_addr
+X-Forwarded-For $proxy_add_x_forwarded_for
+X-Forwarded-Proto $scheme
+X-Forwarded-Host $host
 ```
 
-# Custom addons
-
-La cartella **addons/** contiene addons personalizzati. Inserisci semplicemente i tuoi addons personalizzati se ne hai.
-
-# Configurazione e log di Odoo
-
-* Per modificare la configurazione di Odoo, modifica il file: **etc/odoo.conf**.
-* File di log: **etc/odoo-server.log**
-* Password predefinita del database (**admin_passwd**) è `to_be_modified`, modificala in [etc/odoo.conf#L60](/etc/odoo.conf#L60)
-
-# Gestione container Odoo
-
-**Esegui Odoo**:
-
-```bash
-docker-compose up -d
-```
-
-**Riavvia Odoo**:
-
-```bash
-docker-compose restart
-```
-
-**Ricostruisci Odoo**:
-
-```bash
-docker-compose build
-```
-
-**Ferma Odoo**:
-
-```bash
-docker-compose down
-```
-
-# Configurazione OpenLiteSpeed come Proxy
-
-## Configurazione Virtual Host
-
-Crea un Virtual Host in OpenLiteSpeed con la seguente configurazione:
-
-### 1. General Settings
-- Document Root: `/var/www/html`
-- Index Files: `index.html, index.php`
-
-### 2. Script Handler
-Aggiungi un nuovo Script Handler:
-- Suffixes: `php`
-- Extra Headers: `X-Forwarded-Proto $scheme`
-
-### 3. Rewrite Rules
-Nelle **Rewrite Rules** del Virtual Host:
-
+### Rewrite Rules
 ```apache
 RewriteEngine On
 
-# Rewrite per Odoo main
+# Main Odoo traffic
 RewriteCond %{REQUEST_URI} !^/longpolling/
 RewriteRule ^(.*)$ http://127.0.0.1:10016$1 [P,L]
 
-# Rewrite per longpolling (live chat)
+# Longpolling traffic
 RewriteRule ^/longpolling/(.*)$ http://127.0.0.1:20016/longpolling/$1 [P,L]
 ```
 
-### 4. Context per Proxy
-Crea due Context di tipo **Proxy**:
-
-**Context 1 - Odoo Main:**
-- Type: `Proxy`
-- URI: `/`
-- Web Server Type: `HTTP`
-- Address: `127.0.0.1:10016`
-- Extra Headers:
-  ```
-  X-Real-IP $remote_addr
-  X-Forwarded-For $proxy_add_x_forwarded_for
-  X-Forwarded-Proto $scheme
-  X-Forwarded-Host $host
-  ```
-
-**Context 2 - Longpolling:**
-- Type: `Proxy`
-- URI: `/longpolling/`
-- Web Server Type: `HTTP`
-- Address: `127.0.0.1:20016`
-- Extra Headers:
-  ```
-  X-Real-IP $remote_addr
-  X-Forwarded-For $proxy_add_x_forwarded_for
-  X-Forwarded-Proto $scheme
-  X-Forwarded-Host $host
-  ```
-
-## Configurazione SSL (Opzionale)
-
-Per abilitare HTTPS, aggiungi un SSL Listener:
-
-### SSL Settings
-- Port: `443`
-- Secure: `Yes`
-- Certificate File: `/path/to/your/cert.pem`
-- Private Key File: `/path/to/your/private.key`
-
-### Virtual Host Mapping
-- Virtual Host: `your-odoo-vhost`
-- Domain: `yourdomain.com, *.yourdomain.com`
-
-## Script di configurazione automatica
-
-Crea il file `configure-openlitespeed.sh`:
+## 🛠️ Gestione Container
 
 ```bash
-#!/bin/bash
-# Script per configurare OpenLiteSpeed per Odoo
+# Visualizza stato
+docker-compose ps
 
-DOMAIN=${1:-"localhost"}
-VHOST_NAME="odoo"
+# Logs in tempo reale  
+docker-compose logs -f odoo16
 
-echo "Configurazione OpenLiteSpeed per Odoo su dominio: $DOMAIN"
+# Riavvia servizi
+docker-compose restart
 
-# Backup configurazione esistente
-sudo cp /usr/local/lsws/conf/httpd_config.conf /usr/local/lsws/conf/httpd_config.conf.backup
+# Ferma tutto
+docker-compose down
 
-# Riavvia OpenLiteSpeed
-sudo /usr/local/lsws/bin/lshttpd -t
-sudo systemctl restart lsws
-
-echo "Configurazione completata!"
-echo "Accedi a OpenLiteSpeed WebAdmin: https://your-server:7080"
-echo "Configura manualmente Virtual Host e Context come descritto nel README"
-```
-
-# Live chat
-
-Nel [docker-compose.yml](docker-compose.yml), esponiamo la porta **20016** per live-chat sull'host.
-
-La configurazione di **OpenLiteSpeed** per attivare la funzionalità live chat è descritta sopra nella sezione proxy.
-
-# Versioni Docker
-
-* odoo:16.0
-* postgres:14.10
-* pgadmin4:latest
-
-# Note sui permessi
-
-- I container Odoo e PostgreSQL girano con utenti non-root per sicurezza
-- Le cartelle sono configurate con i permessi corretti automaticamente
-- I volumi Docker gestiscono la persistenza dei dati
-
-# Troubleshooting
-
-## Problema di connessione al database
-```bash
-docker-compose logs db
-docker-compose logs odoo16
-```
-
-## Reset completo
-```bash
-docker-compose down -v
-sudo rm -rf postgresql/ pgadmin-data/
+# Rebuild completo
+docker-compose down
+docker-compose build --no-cache
 docker-compose up -d
 ```
 
-## Verifica stato servizi
-```bash
-docker-compose ps
-docker-compose logs -f odoo16
+## 📁 Struttura Directory
+
 ```
+odoo-one/
+├── docker-compose.yml    # Configurazione servizi
+├── Dockerfile           # Build Odoo personalizzato  
+├── entrypoint.sh        # Script avvio Odoo
+├── addons/             # Custom addons
+├── etc/                # Configurazione Odoo
+│   ├── odoo.conf       # File configurazione principale
+│   └── requirements.txt # Dipendenze Python
+└── clone-oca.sh        # Script per addons OCA
+```
+
+## 🔨 Addons Personalizzati
+
+Posiziona i tuoi addons nella cartella `addons/`:
+
+```bash
+# Aggiungi addon personalizzato
+cp -r my_custom_addon ./addons/
+
+# Riavvia Odoo per caricare nuovi addons
+docker-compose restart odoo16
+```
+
+### Addons OCA
+```bash
+# Scarica tutti gli addons OCA
+./clone-oca.sh
+
+# Riavvia per applicare
+docker-compose restart odoo16
+```
+
+## 🐛 Risoluzione Problemi
+
+### Errore SSL/TLS
+```bash
+# Se vedi errori X509_V_FLAG_NOTIFY_POLICY
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+### Problemi Database
+```bash
+# Reset completo database
+docker-compose down -v
+docker-compose up -d
+
+# Backup database
+docker-compose exec db pg_dump -U odoo postgres > backup.sql
+
+# Restore database  
+docker-compose exec -T db psql -U odoo postgres < backup.sql
+```
+
+### Permessi File
+```bash
+# Ripristina permessi corretti
+sudo chmod -R 755 addons etc
+sudo chmod +x entrypoint.sh
+```
+
+### Performance
+```bash
+# Controlla risorse
+docker stats
+
+# Logs errori
+docker-compose logs --tail=50 odoo16
+```
+
+## 🔧 Configurazione Avanzata
+
+### Modifica `etc/odoo.conf`:
+```ini
+[options]
+addons_path = /mnt/extra-addons
+data_dir = /etc/odoo
+admin_passwd = your_secure_password
+
+# Performance tuning
+workers = 4
+max_cron_threads = 2
+limit_memory_soft = 2147483648
+limit_memory_hard = 2684354560
+
+# Development
+dev_mode = reload
+log_level = debug
+```
+
+### Environment personalizzato:
+```yaml
+# In docker-compose.yml
+environment:
+  - HOST=db
+  - USER=odoo  
+  - PASSWORD=custom_password
+  - PGDATA=/var/lib/postgresql/data/pgdata
+```
+
+## 📊 Monitoraggio
+
+```bash
+# Health check manuale
+curl -I http://localhost:10016
+
+# Database connection test
+docker-compose exec db psql -U odoo -c "SELECT version();"
+
+# Odoo modules list
+docker-compose exec odoo16 odoo shell -d your_db --no-http
+```
+
+## 🚨 Note Importanti
+
+- **Porta 10016/20016**: Configurate di default, modificabili in `docker-compose.yml`
+- **Password Master**: Cambia `to_be_modified` in `etc/odoo.conf`
+- **SSL Fix**: Include fix critici per cryptography/pyOpenSSL
+- **Backup**: I dati persistono nei volumi Docker anche dopo restart
+
+## 📚 Documentazione
+
+- [Documentazione Odoo 16](https://www.odoo.com/documentation/16.0/)
+- [OCA Community Addons](https://github.com/OCA)
+- [Docker Compose Reference](https://docs.docker.com/compose/)
+
+## 🤝 Contributi
+
+Pull requests e issue sono benvenuti! Per modifiche importanti, apri prima una issue per discutere cosa vorresti cambiare.
+
+## 📄 Licenza
+
+Questo progetto è sotto licenza MIT - vedi [LICENSE](LICENSE) per dettagli.
+
+---
+
+⭐ **Se questo progetto ti è utile, lascia una stella!** ⭐
