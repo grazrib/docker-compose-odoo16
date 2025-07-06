@@ -1,33 +1,30 @@
 services:
   db:
-    image: postgres:14.10
+    image: postgres:15
     environment:
       - POSTGRES_USER=odoo
       - POSTGRES_PASSWORD=odoo16@2025      
       - POSTGRES_DB=postgres
       - PGDATA=/var/lib/postgresql/data/pgdata
-    restart: always
     volumes:
-      - ./postgresql:/var/lib/postgresql/data/pgdata
+      - db_data:/var/lib/postgresql/data/pgdata
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U odoo"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      test: ["CMD-SHELL", "pg_isready -U odoo -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
   odoo16:
     build:
       context: .
       dockerfile: Dockerfile
-    image: odoo:16
     depends_on:
       db:
         condition: service_healthy
     ports:
       - "10016:8069"
-      - "20016:8072" # live chat
-    tty: true
-    command: --
+      - "20016:8072"
     environment:
       - HOST=db
       - USER=odoo
@@ -36,27 +33,24 @@ services:
       - ./entrypoint.sh:/entrypoint.sh:ro
       - ./addons:/mnt/extra-addons:rw
       - ./etc:/etc/odoo:rw
-      - odoo_sessions:/opt/odoo/.local/share/Odoo/sessions
-      - odoo_filestore:/opt/odoo/.local/share/Odoo/filestore
-    restart: always
-    user: "101:101"  # Odoo user UID/GID
+      - odoo_data:/var/lib/odoo
+    restart: unless-stopped
 
   pgadmin:
     image: dpage/pgadmin4
     ports:
       - "5050:80"
-    restart: always
-    depends_on:
-      - db
     environment:
       PGADMIN_DEFAULT_EMAIL: 'admin@example.com'    
       PGADMIN_DEFAULT_PASSWORD: 'admin123'
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     volumes:
       - pgadmin_data:/var/lib/pgadmin
-    user: "5050:5050"
+    restart: unless-stopped
+    depends_on:
+      - db
 
 volumes:
-  odoo_sessions:
-  odoo_filestore:
+  db_data:
+  odoo_data:
   pgadmin_data:
