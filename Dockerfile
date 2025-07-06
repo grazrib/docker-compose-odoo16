@@ -11,6 +11,13 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
+# Fix per il problema OpenSSL/pyOpenSSL compatibilità
+RUN pip3 install --upgrade pip \
+    && pip3 install --upgrade \
+        cryptography==41.0.7 \
+        pyOpenSSL==23.3.0 \
+        cffi==1.16.0
+
 # Copia e rende eseguibile l'entrypoint
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
