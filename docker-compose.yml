@@ -1,24 +1,28 @@
-version: '3.4'
 services:
   db:
     image: postgres:14.10
-    user: root
     environment:
       - POSTGRES_USER=odoo
       - POSTGRES_PASSWORD=odoo16@2025      
       - POSTGRES_DB=postgres
-    restart: always             # run as a service
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    restart: always
     volumes:
-        - ./postgresql:/var/lib/postgresql/data
+      - ./postgresql:/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   odoo16:
     build:
       context: .
       dockerfile: Dockerfile
     image: odoo:16
-    user: root
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       - "10016:8069"
       - "20016:8072" # live chat
@@ -29,26 +33,30 @@ services:
       - USER=odoo
       - PASSWORD=odoo16@2025
     volumes:
-      #- /etc/timezone:/etc/timezone:trt
-      #- /etc/localtime:/etc/localtime:trt
-      - ./entrypoint.sh:/entrypoint.sh   
-      - ./addons:/mnt/extra-addons
-      - ./etc:/etc/odoo
-    restart: always             # run as a service
+      - ./entrypoint.sh:/entrypoint.sh:ro
+      - ./addons:/mnt/extra-addons:rw
+      - ./etc:/etc/odoo:rw
+      - odoo_sessions:/opt/odoo/.local/share/Odoo/sessions
+      - odoo_filestore:/opt/odoo/.local/share/Odoo/filestore
+    restart: always
+    user: "101:101"  # Odoo user UID/GID
 
   pgadmin:
     image: dpage/pgadmin4
     ports:
-      - 5050:80
+      - "5050:80"
     restart: always
-    links:
-      - db:db
+    depends_on:
+      - db
     environment:
-      PGADMIN_DEFAULT_EMAIL: 'email@to_be_modified'    
-      PGADMIN_DEFAULT_PASSWORD: 'to_be_modified'
-     # VIRTUAL_HOST: 
-     # LETSENCRYPT_HOST:
-     # VIRTUAL_PORT: 5050
+      PGADMIN_DEFAULT_EMAIL: 'admin@example.com'    
+      PGADMIN_DEFAULT_PASSWORD: 'admin123'
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
     volumes:
-      - ./pgadmin-data:/var/lib/pgadmin
-      #- /var/run/docker.sock:/tmp/docker.sock
+      - pgadmin_data:/var/lib/pgadmin
+    user: "5050:5050"
+
+volumes:
+  odoo_sessions:
+  odoo_filestore:
+  pgadmin_data:
