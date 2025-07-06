@@ -60,25 +60,25 @@ $ git clone https://github.com/grazrib/docker-compose-odoo16.git
 $ cd docker-compose-odoo16
 
 # Crea le directory necessarie
-$ mkdir -p postgresql addons etc pgadmin-data
+mkdir -p postgresql addons etc pgadmin-data
 
 # Imposta permessi per Odoo (UID:GID 101:101)
-$ sudo chown -R 101:101 addons etc
-$ sudo chmod -R 755 addons etc
+sudo chown -R 101:101 addons etc
+sudo chmod -R 755 addons etc
 
 # Imposta permessi per PostgreSQL (UID:GID 5432:5432)  
-$ sudo chown -R 5432:5432 postgresql
-$ sudo chmod -R 700 postgresql
+sudo chown -R 5432:5432 postgresql
+sudo chmod -R 700 postgresql
 
 # Imposta permessi per PgAdmin (UID:GID 5050:5050)
-$ sudo chown -R 5050:5050 pgadmin-data
-$ sudo chmod -R 755 pgadmin-data
+sudo chown -R 5050:5050 pgadmin-data
+sudo chmod -R 755 pgadmin-data
 
 # Rende eseguibile l'entrypoint
-$ chmod +x entrypoint.sh
+chmod +x entrypoint.sh
 
 # Verifica permessi (opzionale)
-$ ls -la
+ls -la
 ```
 
 **Spiegazione dei permessi:**
