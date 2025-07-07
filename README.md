@@ -6,10 +6,12 @@ Installazione Odoo 16 con un comando - Configurazione ottimizzata per OpenLiteSp
 
 Installa [docker](https://docs.docker.com/get-docker/) e [docker-compose](https://docs.docker.com/compose/install/), poi esegui:
 
-### 🎯 Installazione Rapida
+### 🎯 Installazione Rapida (modifica odoo16-one se vuoi una cartella diversa)
 
 ```bash
 curl -s https://raw.githubusercontent.com/grazrib/docker-compose-odoo16/master/run.sh | sudo bash -s odoo16-one 10016 20016
+
+curl -s https://raw.githubusercontent.com/grazrib/docker-compose-odoo16/master/run.sh | sudo bash -s odoo16-two 11016 21016
 ```
 
 ### 🔧 Installazione Personalizzata
