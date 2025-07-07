@@ -11,7 +11,7 @@ services:
     volumes:
         - ./postgresql:/var/lib/postgresql/data
 
-  odoo18:
+  odoo16:
     build:
       context: .
       dockerfile: Dockerfile
