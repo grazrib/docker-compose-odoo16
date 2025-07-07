@@ -141,6 +141,7 @@ if [ ! -z "$DEV_MODE_VALUE" ]; then
 fi
 
 echo "🔐 Impostazione permessi..."
+# set correct permissions for docker users
 sudo chown -R 101:101 $DESTINATION/addons
 sudo chown -R 101:101 $DESTINATION/etc
 sudo chown -R 999:999 $DESTINATION/postgresql
@@ -150,6 +151,9 @@ sudo chmod -R 755 $DESTINATION/addons
 sudo chmod -R 755 $DESTINATION/etc
 sudo chmod -R 755 $DESTINATION/postgresql
 sudo chmod -R 755 $DESTINATION/pgadmin-data
+
+# set executable permission for entrypoint.sh (fix Docker permission denied)
+sudo chmod 755 $DESTINATION/entrypoint.sh
 
 echo "⚙️  Configurazione sistema..."
 if grep -qF "fs.inotify.max_user_watches" /etc/sysctl.conf; then 
