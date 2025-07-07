@@ -10,7 +10,8 @@ Installa [docker](https://docs.docker.com/get-docker/) e [docker-compose](https:
 
 ```bash
 curl -s https://raw.githubusercontent.com/grazrib/docker-compose-odoo16/master/run.sh | sudo bash -s odoo16-one 10016 20016
-
+```
+```bash
 curl -s https://raw.githubusercontent.com/grazrib/docker-compose-odoo16/master/run.sh | sudo bash -s odoo16-two 11016 21016
 ```
 
