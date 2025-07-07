@@ -29,11 +29,13 @@ echo
 echo "--- CREDENZIALI DATABASE ---"
 read -p "Database User [odoo]: " DB_USER
 DB_USER=${DB_USER:-odoo}
-read -s -p "Database Password [obbligatoria]: " DB_PASSWORD
+echo -n "Database Password [obbligatoria]: "
+read -s DB_PASSWORD
 echo
 while [ -z "$DB_PASSWORD" ]; do
     echo "⚠️  La password del database è obbligatoria!"
-    read -s -p "Database Password: " DB_PASSWORD
+    echo -n "Database Password: "
+    read -s DB_PASSWORD
     echo
 done
 
@@ -42,11 +44,13 @@ echo
 echo "--- CREDENZIALI PGADMIN ---"
 read -p "pgAdmin Email [admin@localhost]: " PGADMIN_EMAIL
 PGADMIN_EMAIL=${PGADMIN_EMAIL:-admin@localhost}
-read -s -p "pgAdmin Password [obbligatoria]: " PGADMIN_PASSWORD
+echo -n "pgAdmin Password [obbligatoria]: "
+read -s PGADMIN_PASSWORD
 echo
 while [ -z "$PGADMIN_PASSWORD" ]; do
     echo "⚠️  La password di pgAdmin è obbligatoria!"
-    read -s -p "pgAdmin Password: " PGADMIN_PASSWORD
+    echo -n "pgAdmin Password: "
+    read -s PGADMIN_PASSWORD
     echo
 done
 
