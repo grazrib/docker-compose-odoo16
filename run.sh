@@ -84,7 +84,7 @@ data_dir = /etc/odoo
 # | HTTP Service |
 # ==============================
 http_port = 8069
-longpolling_port = 8072
+gevent_port = 8072
 proxy_mode = $PROXY_MODE_VALUE
 
 # ===============================
@@ -116,7 +116,7 @@ log_db_level = warning
 # | Security |
 # ============================
 list_db = True
-dbfilter = ^%h$|^%d$
+# dbfilter = ^%h$|^%d$
 
 # ===========================
 # | Performance |
